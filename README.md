@@ -5,6 +5,7 @@
 3. .env-example rename as .env
 4. npm install
 5. npm start
+6. 
 API:
 POST-http://localhost:3000/calendar
 
