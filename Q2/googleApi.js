@@ -1,5 +1,7 @@
 import { google } from 'googleapis';
 import dotenv from "dotenv";
+import Joi from 'joi';
+
 dotenv.config(); 
 
 const apiKey = process.env.API_KEY
@@ -10,8 +12,17 @@ const calendar = google.calendar({
 });
 
 export const checkFreeBusy=async(payload) =>{
-  const {startTime,endTime}=payload
   try {
+    const schema = Joi.object({
+      startTime: Joi.date().required(),
+      endTime: Joi.date().required(),
+    }).required();
+  
+    const { error, value } = schema.validate(payload);
+    if (error) {
+      throw new Error(error.message);
+    }
+  const {startTime,endTime}=value
     const requestBody = {
       timeMin: startTime,
       timeMax: endTime,
@@ -20,8 +31,8 @@ export const checkFreeBusy=async(payload) =>{
     const res = await calendar.freebusy.query({
       requestBody,
     });
-    return res.data.calendars[calendarId.toString()];
+      return res.data.calendars[calendarId.toString()];
   } catch (error) {
-    console.error('Error checking free/busy times:', error);
+      throw error
   }
 }
